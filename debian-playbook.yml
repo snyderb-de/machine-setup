@@ -1,0 +1,61 @@
+---
+- name: New Debian Setup
+  hosts: localhost
+  become: true
+
+  vars:
+    apt_packages:
+      - cmake
+      - curl
+      - fonts-font-awesome
+      - g++
+      - gettext
+      - gh
+      - git
+      - libtool-bin
+      - lolcat
+      - locate
+      - mdbtools
+      - ninja-build
+      - pkg-config
+      - powershell
+      - python3-venv
+      - shellcheck
+      - tmux
+      - unzip
+      - zsh
+    snap_packages:
+      - brave
+      - firefox
+      - gitkraken
+      - glow
+      - telegram-desktop
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install apt packages
+      apt:
+        name: "{{ apt_packages }}"
+        state: present
+
+    - name: Install snap packages
+      community.general.snap:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ snap_packages }}"
+      when: "'snap' in ansible_system_packages"
+
+    - name: Install snapd package if snap is not installed
+      apt:
+        name: snapd
+        state: present
+      when: "'snap' not in ansible_system_packages"
+
+    - name: Install apt packages again after installing snapd
+      apt:
+        name: "{{ apt_packages }}"
+        state: present
+      when: "'snap' not in ansible_system_packages"
