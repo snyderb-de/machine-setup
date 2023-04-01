@@ -1,11 +1,7 @@
----
 - name: New Debian Setup
   hosts: localhost
-  become: true
-  become_method: su
-  become_user: "{{ ansible_user }}"
-
   vars:
+    ansible_user: "{{ lookup('env', 'USER') }}"
     apt_packages:
       - cmake
       - curl
@@ -32,32 +28,42 @@
       - gitkraken
       - glow
       - telegram-desktop
-
+  become: true
+  become_method: su
+  become_user: "{{ ansible_user }}"
   tasks:
+    - name: Debug ansible_user
+      debug:
+        var: ansible_user
+
     - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Install apt packages
+    - name: Install required packages via apt
       apt:
         name: "{{ apt_packages }}"
         state: present
+
+    - name: Gather system package facts
+      package_facts:
+        manager: auto
+
+    - name: Install snapd package if snap is not installed
+      apt:
+        name: snapd
+        state: present
+      when: "'snap' not in ansible_facts['packages']"
 
     - name: Install snap packages
       community.general.snap:
         name: "{{ item }}"
         state: present
       loop: "{{ snap_packages }}"
-      when: "'snap' in ansible_system_packages"
-
-    - name: Install snapd package if snap is not installed
-      apt:
-        name: snapd
-        state: present
-      when: "'snap' not in ansible_system_packages"
+      when: "'snap' in ansible_facts['packages']"
 
     - name: Install apt packages again after installing snapd
       apt:
         name: "{{ apt_packages }}"
         state: present
-      when: "'snap' not in ansible_system_packages"
+      when: "'snap' not in ansible_facts['packages']"
