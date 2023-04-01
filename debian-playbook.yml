@@ -2,6 +2,8 @@
 - name: New Debian Setup
   hosts: localhost
   become: true
+  become_method: su
+  become_user: "{{ ansible_user }}"
 
   vars:
     apt_packages:
