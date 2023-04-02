@@ -8,8 +8,7 @@
   tasks:
     - name: Loading package lists from YAML file... 
       include_vars:
-        file: install-packages.yml
-        name: install-packages
+        file: package-list.yml
 
     - name: Debug ansible_user check
       debug:
@@ -21,23 +20,23 @@
 
     - name: Installing apt packages from YAML file
       apt:
-        name: "{{ install-packages.apt_packages }}"
+        name: "{{ item }}"
         state: present
+      loop: "{{ apt_packages }}"
 
     - name: Gathering system package facts
       package_facts:
         manager: auto
 
-    - name: Installing snapd if its not installed
+    - name: Installing snapd if it's not installed
       apt:
         name: snapd
         state: present
-      when: "'snap' not in ansible_facts['packages']"
+      when: "'snap' not in ansible_facts.packages"
 
     - name: Installing snap packages
-      community.general.snap:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ install-packages.snap_packages }}"
-      when: "'snap' in ansible_facts.packages"
-
+      ansible.builtin.command:
+        cmd: "snap install {{ item }}"
+      loop: "{{ snap_packages }}"
+      become: true
+      when: "'snapd' in ansible_facts.packages"
