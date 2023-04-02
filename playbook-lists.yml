@@ -1,6 +1,7 @@
 apt_packages:
   - cmake
   - curl
+  - fd-find
   - fonts-font-awesome
   - g++
   - gettext
@@ -14,6 +15,7 @@ apt_packages:
   - pkg-config
   - powershell
   - python3-venv
+  - ripgrep
   - shellcheck
   - tmux
   - unzip
@@ -24,4 +26,14 @@ snap_packages:
   - gitkraken
   - glow
   - telegram-desktop
+dir_list:
+  - bin
+  - build
+  - hax
+  - tmp
+  - .local/bin
+  - .config/shell
+add_to_path:
+  - $HOME/bin
+  - $HOME/.local/bin
 

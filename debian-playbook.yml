@@ -1,3 +1,17 @@
+# Ansible Playbook for a new Debian nerd environment
+
+# TODO: figure out dotfiles (user choose bash or zsh)
+# TODO: ?? handle XDG Moves - check for directories and create if not present
+# TODO: ?? make a list of XDG migrations needed at this point
+# TODO: this should run chezmoi from the user's github, but it should ask. 
+# TODO: running chezmoi should have the option to dump dots or keep chezmoi
+# TODO: install FNM and LTS Node/NPM
+# TODO: add neovim checkhealth warnings here
+# TODO: build neovim from source, check prereq first
+# TODO: test on bare VM (docker?)
+
+# this requires playbook-lists.yml
+
 - name: New Debian Setup
   hosts: localhost
   vars:
@@ -8,11 +22,17 @@
   tasks:
     - name: Loading package lists from YAML file... 
       include_vars:
-        file: package-list.yml
+        file: playbook-lists.yml
 
     - name: Debug ansible_user check
       debug:
         var: ansible_user
+
+    - name: Ensure directories exist in the user's home directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/{{ item }}"
+        state: directory
+      loop:  "{{ dir_list }}"
 
     - name: Updating apt cache
       apt:
@@ -40,3 +60,6 @@
       loop: "{{ snap_packages }}"
       become: true
       when: "'snapd' in ansible_facts.packages"
+
+
+

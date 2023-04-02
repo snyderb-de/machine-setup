@@ -28,6 +28,13 @@ gitkraken
 glow
 telegram-desktop
 
+# add custom home folders
+
+# install fnm
+# install lts current node
+
+
+
 # from source
 neovim
 

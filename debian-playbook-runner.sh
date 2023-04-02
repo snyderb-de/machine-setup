@@ -12,7 +12,6 @@ export ANSIBLE_BECOME_PASS="$password"
 # DryRun the playbook
 ansible-playbook debian-playbook.yml --check
 
-
 # Run the playbook
 # ansible-playbook debian-playbook.yml
 
