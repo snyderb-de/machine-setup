@@ -2,69 +2,42 @@
   hosts: localhost
   vars:
     ansible_user: "{{ lookup('env', 'USER') }}"
-    ansible_become_pass: "{{ lookup('env', 'ANSIBLE_BECOME_PASS') }}"    
-    apt_packages:
-      - cmake
-      - curl
-      - fonts-font-awesome
-      - g++
-      - gettext
-      - gh
-      - git
-      - libtool-bin
-      - lolcat
-      - locate
-      - mdbtools
-      - ninja-build
-      - pkg-config
-      - powershell
-      - python3-venv
-      - shellcheck
-      - tmux
-      - unzip
-      - zsh
-    snap_packages:
-      - brave
-      - firefox
-      - gitkraken
-      - glow
-      - telegram-desktop
   become: true
   become_method: su
   become_user: "{{ ansible_user }}"
   tasks:
-    - name: Debug ansible_user
+    - name: Loading package lists from YAML file... 
+      include_vars:
+        file: install-packages.yml
+        name: install-packages
+
+    - name: Debug ansible_user check
       debug:
         var: ansible_user
 
-    - name: Update apt cache
+    - name: Updating apt cache
       apt:
         update_cache: yes
 
-    - name: Install required packages via apt
+    - name: Installing apt packages from YAML file
       apt:
-        name: "{{ apt_packages }}"
+        name: "{{ install-packages.apt_packages }}"
         state: present
 
-    - name: Gather system package facts
+    - name: Gathering system package facts
       package_facts:
         manager: auto
 
-    - name: Install snapd package if snap is not installed
+    - name: Installing snapd if its not installed
       apt:
         name: snapd
         state: present
       when: "'snap' not in ansible_facts['packages']"
 
-    - name: Install snap packages
+    - name: Installing snap packages
       community.general.snap:
         name: "{{ item }}"
         state: present
-      loop: "{{ snap_packages }}"
+      loop: "{{ install-packages.snap_packages }}"
       when: "'snap' in ansible_facts.packages"
 
-    - name: Install apt packages again after installing snapd
-      apt:
-        name: "{{ apt_packages }}"
-        state: present
-      when: "'snap' not in ansible_facts['packages']"
