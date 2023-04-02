@@ -1,0 +1,27 @@
+apt_packages:
+  - cmake
+  - curl
+  - fonts-font-awesome
+  - g++
+  - gettext
+  - gh
+  - git
+  - libtool-bin
+  - lolcat
+  - locate
+  - mdbtools
+  - ninja-build
+  - pkg-config
+  - powershell
+  - python3-venv
+  - shellcheck
+  - tmux
+  - unzip
+  - zsh
+snap_packages:
+  - brave
+  - firefox
+  - gitkraken
+  - glow
+  - telegram-desktop
+
